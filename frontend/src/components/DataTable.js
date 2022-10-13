@@ -10,24 +10,28 @@ import Paper from "@mui/material/Paper";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
-import { notification } from "antd";
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function DataTable() {
   const [rows, setRows] = useState([]);
+  const [loader, setLoader] = useState(true);
 
   const getData = () => {
     axios
       .get(`http://127.0.0.1:8000/web-scrap/scrap-data`)
       .then((res) => {
-        setRows(res?.data);
+        setRows(res?.data?.data);
+        setLoader(false);
       })
       .catch((err) => {
-        alert(err)
+        setLoader(false);
+        alert(err);
       });
   };
 
   useEffect(() => {
-     setInterval(getData,6000)
+    //  setInterval(getData,6000);
+     getData()
   }, []);
 
   return (
@@ -67,7 +71,8 @@ export default function DataTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      {rows.length === 0 ? (
+      {loader ? <CircularProgress /> : null}
+      {rows.length === 0 && !loader ? (
         <Stack sx={{ width: "100%" }} spacing={2}>
           <Alert severity="error"> SORRY THERE IS NO DATA FOUND! </Alert>
         </Stack>
